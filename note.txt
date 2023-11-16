@@ -1,0 +1,52 @@
+++++++++++++++++++++ package.json ++++++++++++++++++++
++ "lint": "eslint src --ext js --report-unused-disable-directives --max-warnings 0"
+=> Chạy eslint trỏ đến thư mục src, áp dụng đối với các file js. Chúng ta sẽ không setup hiển thị tối đa bao nhiêu lỗi từ eslint
+
++ "build-babel": "babel ./src -d ./build/src"
+=> Chạy babel để build các file trong folder src (input) ra folder build/src (output). Các file trong folder src/build này sẽ được đẩy lên 
+môi trường production (Đảm bảo tất cả các trình duyệt có thể đọc được code). Chúng ta sẽ không đẩy folder build/src này lên trên github
+
++ "dev": "nodemon --exec babel-node ./src/server.js"
+=> Chạy nodemon và thực thi gói babel-node đối với file server.js trong folder src
+
++ "production": "npm run build && node ./build/src/server.js"
+=> Khi mà chúng ta đẩy code lên trên production thì chúng ta sẽ đẩy bộ code đã được build trong build/src chứ không đẩy code ở trong src mà chúng ta code
+
++ "clean": "rm -rf build && mkdir build"
+=> Cứ sau mỗi 1 lần cập nhật, sửa code thì chúng ta phải build mới lại thì nếu chúng ta muốn dọn dẹp sạch sẽ folder build trước đó đi thì chúng ta sẽ 
+dùng câu lệnh này. 
+
++ Để có thể chạy biến môi trường trong các câu lệnh scripts 1 cách ổn định trên tất cả các hệ điều hành (linux, windows, ubuntu, macos, ...) thì 
+chúng ta sẽ sử dụng thư viện cross-env
+
+Chức năng lần lượt của từng thư viện babel 
++ @babel/core:
+- Gói core cơ bản của Babel, dùng để chạy bất kỳ các thiết lập / cấu hình của babel.
++ @babel/cli:
+- Sử dụng để biên dịch các files từ dòng lệnh.
++ @babel/node:
+- Là một CLI tương tự Node CLI, sử dụng để biên dịch tương thích với các cài đặt của Babel Preset và Babel Plugins
++ @babel/preset-env:
+- Thằng này khá là hay, nó là một smart preset tự động sử dụng phiên bản Javascript mới nhất mà không cần khai báo cụ thể từng phiên bản một. Nói chung nó 
+giúp cho cuộc sống dev của chúng ta dễ dàng hơn rất nhiều 
++ @babel/plugin-transform-runtime:
+- Plugin này cho phép babel tái sử dụng lại code của chính nó để giảm kích thước code.
++ @babel/runtime:
+Theo như tài liệu chính thức của Babel thì gói này nên được install ở dependencies thay vì devDependencies vì nó sẽ phụ thuộc vào code sau khi đã 
+triển khai xong. Tác dụng của nó là để tái sử dụng lại code hay cũng có thể hiểu là để tránh trùng lặp code sau khi đã build xong hết code ở production, 
+bởi vì đôi khi Babel sẽ biên dịch ra các mã code giống nhau giữa các files.
+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++ .babelrc ++++++++++++++++++++
++ Để có thể chạy thực thi được các câu lệnh liên quan đến babel thì chúng ta buộc phải có file .babelrc
++ "module-resolver", { "alias": { "~": "./src" } }: Xử lý Absolute Relative import (Sử dụng gói babel-plugin-module-resolver). Dấu ~ này
+chính là đi vào folder src (Dấu ~ này sẽ tương đương với ./src) (Do file .babelrc đang cùng cấp với folder src)
+VD: import { mapOrder } from '~/utils/sorts.js' sẽ tương đương với import { mapOrder } from '.src/utils/sorts.js'
+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++ jsconfig.json ++++++++++++++++++++
++ Do ta đang sử dụng module-resolver để xử lý các đường dẫn absolute và relative ("module-resolver", { "alias": { "~": "./src" } }) được khai báo 
+trong file .babelrc nên để khi ta ctrl click vào cái đường dẫn mà nó có thể di chuyển được đến cái file mà ta ctrl click thì ta bắt buộc phải khai báo file 
+jsconfig.json ("~/*": ["./src/*"],)
++ File này chỉ dành riêng cho việc chúng ta làm việc với visual studio code => Hết
+++++++++++++++++++++++++++++++++++++++++++++++++++
