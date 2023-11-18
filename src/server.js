@@ -1,11 +1,19 @@
 /* eslint-disable no-console */ // Cho phép sủ dụng console.log ở toàn bộ file này
 import express from 'express'
 import exitHook from 'async-exit-hook'
-import { CONNECT_DB, GET_DB, CLOSE_DB } from '~/config/mongodb'
+import { CONNECT_DB, CLOSE_DB } from '~/config/mongodb'
 import { env } from '~/config/environment'
+import { APIsV1 } from '~/routes/v1'
+import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 
 const START_SERVER = () => {
   const app = express()
+
+  app.use(express.json())
+  app.use('/v1', APIsV1)
+
+  // Handle Error For App
+  app.use(errorHandlingMiddleware)
 
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
@@ -17,6 +25,7 @@ const START_SERVER = () => {
   exitHook(() => {
     console.log('Disconnecting from MongoDB Cloud Atlas...')
     CLOSE_DB()
+    console.log('Disconnected from MongoDB Cloud Atlas !')
   })
 }
 
