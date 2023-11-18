@@ -21,4 +21,8 @@ const GET_DB = () => {
   return trelloDatabaseInstance
 }
 
-export { CONNECT_DB, GET_DB }
+const CLOSE_DB = async () => {
+  await client.close()
+}
+
+export { CONNECT_DB, GET_DB, CLOSE_DB }

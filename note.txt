@@ -50,3 +50,9 @@ trong file .babelrc nên để khi ta ctrl click vào cái đường dẫn mà n
 jsconfig.json ("~/*": ["./src/*"],)
 + File này chỉ dành riêng cho việc chúng ta làm việc với visual studio code => Hết
 ++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+++++++++++++++++++++ Đóng kết nối mongodb ++++++++++++++++++++
++ Chúng ta chỉ đóng kết nối server khi hệ thống bị crash, dead hoặc stop đột ngột, chúng ta chủ động stop chứ không sử dụng close connection ở mọi api
++ Mỗi một mongodbClient đại diện cho 1 pool connection
+++++++++++++++++++++++++++++++++++++++++++++++++++
