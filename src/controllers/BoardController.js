@@ -12,8 +12,19 @@ const createBoard = async (req, res, next) => {
   }
 }
 
+const getDetailBoard = async (req, res, next) => {
+  try {
+    const result = await BoardService.getDetailBoard(req.params.id)
+    res.status(StatusCodes.CREATED).json(result)
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
 const BoardController = {
-  createBoard
+  createBoard,
+  getDetailBoard
 }
 
 export { BoardController }

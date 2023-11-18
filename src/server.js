@@ -1,18 +1,22 @@
 /* eslint-disable no-console */ // Cho phép sủ dụng console.log ở toàn bộ file này
 import express from 'express'
 import exitHook from 'async-exit-hook'
-import { CONNECT_DB, CLOSE_DB } from '~/config/mongodb'
+import cors from 'cors'
 import { env } from '~/config/environment'
+import { CONNECT_DB, CLOSE_DB } from '~/config/mongodb'
 import { APIsV1 } from '~/routes/v1'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
+import { corsOptions } from '~/config/cors'
 
 const START_SERVER = () => {
   const app = express()
 
+  app.use(cors(corsOptions))
+
   app.use(express.json())
+
   app.use('/v1', APIsV1)
 
-  // Handle Error For App
   app.use(errorHandlingMiddleware)
 
 
