@@ -17,4 +17,3 @@ const ColumnModel = {
 }
 
 export { ColumnModel }
- 

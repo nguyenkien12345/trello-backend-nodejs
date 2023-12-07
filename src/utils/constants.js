@@ -3,4 +3,9 @@ const WHITELIST_DOMAINS = [
   'http://localhost:5173'
 ]
 
-export { WHITELIST_DOMAINS }
+const BOARD_TYPES = {
+  'PUBLIC': 'public',
+  'PRIVATE': 'private'
+}
+
+export { WHITELIST_DOMAINS, BOARD_TYPES }

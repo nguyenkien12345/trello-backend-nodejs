@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
+import { BOARD_TYPES } from '~/utils/constants'
 import Joi from 'joi'
 import ApiError from '~/middlewares/ApiError'
 
@@ -17,7 +18,9 @@ const createBoard = async (req, res, next) => {
       'string.min': 'description length must be at least 3 characters long',
       'string.max': 'description length must be less than or equal to 256 characters long',
       'string.trim': 'description must not have leading or trailing whitespace'
-    })
+    }),
+    // field type chỉ chấp nhận 1 trong 2 giá trị là public hoặc private
+    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
   })
 
   try {
