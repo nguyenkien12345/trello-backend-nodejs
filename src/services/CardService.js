@@ -42,10 +42,25 @@ const getDetailCard = async (id) => {
   }
 }
 
+const deleteCard = async (cardId) => {
+  try {
+    // Cập nhật lại mảng cardOrderIds của Column
+    const targetCard = await CardModel.getCard(cardId)
+    if (!targetCard) throw new ApiError(StatusCodes.NOT_FOUND, 'card not found')
+    await ColumnModel.pullCardIdToCardOrderIds(targetCard)
+    // Xóa Card
+    await CardModel.deleteCard(cardId)
+  }
+  catch (error) {
+    throw error
+  }
+}
+
 const CardService = {
   createCard,
   getCards,
-  getDetailCard
+  getDetailCard,
+  deleteCard
 }
 
 export { CardService }

@@ -91,7 +91,7 @@ const pushColumnIdTocolumnOrderIds = async (column) => {
       // returnDocument: 'after' => Nếu không truyền vào flag này thì nó sẽ trả về record trước khi update,
       // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
       { returnDocument: 'after' }
-    ) 
+    )
   }
   catch (error) {
     throw new Error(error)

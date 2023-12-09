@@ -88,6 +88,15 @@ const deleteManyCardByColumnId = async (columnId) => {
   }
 }
 
+const deleteCard = async (id) => {
+  try {
+    return await GET_DB().collection(CARD_COLLECTION_NAME).deleteOne({ _id: new ObjectId(id) })
+  }
+  catch (error) {
+    throw new Error(error)
+  }
+}
+
 const CardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
@@ -95,7 +104,8 @@ const CardModel = {
   getCards,
   getCard,
   getDetailCard,
-  deleteManyCardByColumnId
+  deleteManyCardByColumnId,
+  deleteCard
 }
 
 export { CardModel }

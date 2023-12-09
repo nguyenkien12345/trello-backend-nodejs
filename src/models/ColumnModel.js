@@ -93,6 +93,22 @@ const pushCardIdToCardOrderIds = async (card) => {
   }
 }
 
+const pullCardIdToCardOrderIds = async (card) => {
+  try {
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(card.columnId) },
+      // Thêm id của card đó vào mảng cardOrderIds của coulumn
+      { $pull: { cardOrderIds: new ObjectId(card._id) } },
+      // returnDocument: 'after' => Nếu không truyền vào flag này thì nó sẽ trả về record trước khi update,
+      // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
+      { returnDocument: 'after' }
+    )
+  }
+  catch (error) {
+    throw new Error(error)
+  }
+}
+
 const deleteColumn = async (id) => {
   try {
     return await GET_DB().collection(COLUMN_COLLECTION_NAME).deleteOne({ _id: new ObjectId(id) })
@@ -110,6 +126,7 @@ const ColumnModel = {
   getColumn,
   getDetailColumn,
   pushCardIdToCardOrderIds,
+  pullCardIdToCardOrderIds,
   deleteColumn
 }
 

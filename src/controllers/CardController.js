@@ -31,10 +31,21 @@ const getDetailCard = async (req, res, next) => {
   }
 }
 
+const deleteCard = async (req, res, next) => {
+  try {
+    const result = await CardService.deleteCard(req.params.id)
+    res.status(StatusCodes.OK).json(result)
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
 const CardController = {
   createCard,
   getCards,
-  getDetailCard
+  getDetailCard,
+  deleteCard
 }
 
 export { CardController }

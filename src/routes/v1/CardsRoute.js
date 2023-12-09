@@ -10,6 +10,7 @@ Router.route('/')
 
 Router.route('/:id')
   .get(CardController.getDetailCard)
+  .delete(CardValidation.deleteCard, CardController.deleteCard)
 
 const CardRoutes = Router
 
