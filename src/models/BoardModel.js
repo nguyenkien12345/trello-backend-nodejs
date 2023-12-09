@@ -25,13 +25,11 @@ const validateBeforeCreate = async (data) => {
 
 const createBoard = async (data) => {
   try {
-    // Luôn luôn validate data ở tầng model trước khi tạo 1 đối tượng
     const validData = await validateBeforeCreate(data)
     const newBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
     return newBoard
   }
   catch (error) {
-    // throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi
     throw new Error(error)
   }
 }
@@ -42,7 +40,6 @@ const getBoard = async (id) => {
     return board
   }
   catch (error) {
-    // throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi
     throw new Error(error)
   }
 }
@@ -69,12 +66,26 @@ const getDetailBoard = async (id) => {
         as: 'cards' // 1 cái Board có nhiều cái cards. cards chính là tên key khi dữ liệu được trả về
       } }
     ]).toArray()
-    // Vì chúng ta đang làm Get Detail Board nên khi kết quả trả về là một mảng (thông qua toArray()) thì chúng ta chỉ cần lấy ra
-    // phần tử đầu tiên trong mảng mà thôi
     return result[0] || {}
   }
   catch (error) {
-    // throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi
+    throw new Error(error)
+  }
+}
+
+const pushColumnIdTocolumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(column.boardId) },
+      // Thêm id của column đó vào mảng columnOrderIds của board
+      { $push: { columnOrderIds: new ObjectId(column._id) } },
+      // returnDocument: 'after' => Nếu không truyền vào flag này thì nó sẽ trả về record trước khi update,
+      // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
+      { returnDocument: 'after' }
+    )
+    return result.value
+  }
+  catch (error) {
     throw new Error(error)
   }
 }
@@ -84,7 +95,11 @@ const BoardModel = {
   BOARD_COLLECTION_SCHEMA,
   createBoard,
   getBoard,
-  getDetailBoard
+  getDetailBoard,
+  pushColumnIdTocolumnOrderIds
 }
 
 export { BoardModel }
+
+// Lý thuyết
+// - throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi

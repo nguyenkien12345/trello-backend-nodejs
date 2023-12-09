@@ -20,13 +20,14 @@ const validateBeforeCreate = async (data) => {
 
 const createColumn = async (data) => {
   try {
-    // Luôn luôn validate data ở tầng model trước khi tạo 1 đối tượng
     const validData = await validateBeforeCreate(data)
-    const newColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(validData)
+    const newColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne({
+      ...validData,
+      boardId: new ObjectId(validData.boardId)
+    })
     return newColumn
   }
   catch (error) {
-    // throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi
     throw new Error(error)
   }
 }
@@ -37,7 +38,23 @@ const getColumn = async (id) => {
     return column
   }
   catch (error) {
-    // throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi
+    throw new Error(error)
+  }
+}
+
+const pushCardIdToCardOrderIds = async (card) => {
+  try {
+    const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(card.columnId) },
+      // Thêm id của card đó vào mảng cardOrderIds của coulumn
+      { $push: { cardOrderIds: new ObjectId(card._id) } },
+      // returnDocument: 'after' => Nếu không truyền vào flag này thì nó sẽ trả về record trước khi update,
+      // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
+      { returnDocument: 'after' }
+    )
+    return result.value
+  }
+  catch (error) {
     throw new Error(error)
   }
 }
@@ -46,7 +63,11 @@ const ColumnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createColumn,
-  getColumn
+  getColumn,
+  pushCardIdToCardOrderIds
 }
 
 export { ColumnModel }
+
+// Lý thuyết
+// - throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi

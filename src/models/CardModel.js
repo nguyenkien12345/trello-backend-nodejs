@@ -21,13 +21,15 @@ const validateBeforeCreate = async (data) => {
 
 const createCard = async (data) => {
   try {
-    // Luôn luôn validate data ở tầng model trước khi tạo 1 đối tượng
     const validData = await validateBeforeCreate(data)
-    const newCard = await GET_DB().collection(CARD_COLLECTION_NAME).insertOne(validData)
+    const newCard = await GET_DB().collection(CARD_COLLECTION_NAME).insertOne({
+      ...validData,
+      boardId: new ObjectId(validData.boardId),
+      columnId: new ObjectId(validData.columnId)
+    })
     return newCard
   }
   catch (error) {
-    // throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi
     throw new Error(error)
   }
 }
@@ -38,7 +40,6 @@ const getCard = async (id) => {
     return card
   }
   catch (error) {
-    // throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi
     throw new Error(error)
   }
 }
@@ -51,3 +52,6 @@ const CardModel = {
 }
 
 export { CardModel }
+
+// Lý thuyết
+// - throw new Error mới trả ra được stack trace lỗi (để biết được cái lỗi xảy ra ở đâu) còn throw error không trả ra stack trace lỗi
