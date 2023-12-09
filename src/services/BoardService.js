@@ -7,13 +7,20 @@ import { cloneDeep } from 'lodash'
 
 const createBoard = async (data) => {
   try {
-    const newBoard = {
+    const createdBoard = await BoardModel.createBoard({
       ...data,
       slug: slugify(data.title)
-    }
-    const createdBoard = await BoardModel.createBoard(newBoard)
-    const result = await BoardModel.getBoard(createdBoard.insertedId)
-    return result
+    })
+    return await BoardModel.getBoard(createdBoard.insertedId)
+  }
+  catch (error) {
+    throw error
+  }
+}
+
+const getBoards = async () => {
+  try {
+    return await BoardModel.getBoards()
   }
   catch (error) {
     throw error
@@ -23,9 +30,7 @@ const createBoard = async (data) => {
 const getDetailBoard = async (id) => {
   try {
     const result = await BoardModel.getDetailBoard(id)
-
     if (!result) throw new ApiError(StatusCodes.NOT_FOUND, 'board not found')
-
     // Giả sử chúng ta đang có dữ liệu trả về của biến result là:
     // {
     //   "_id": "6571e303ee04abac6451273f",
@@ -68,14 +73,12 @@ const getDetailBoard = async (id) => {
       // Thêm cards vào trong từng cái column bằng cách gắn biến cards vào column
       // Cách 1
       // column.cards = cloneResponseBoard.cards.filter(card => card.columnId.toString() === column._id.toString())
-      
       // Cách 2
       column.cards = cloneResponseBoard.cards.filter(card => card.columnId.equals(column._id))
     })
 
     // Sau khi đã đưa cái cards vào trong columns xong thì chúng ta nên xóa cái cards đang nằm song song cùng cấp với columns đi
     delete cloneResponseBoard.cards
-
     // Lúc này kết quả mới của chúng ta là:
     // {
     //   "_id": "6571e303ee04abac6451273f",
@@ -117,6 +120,7 @@ const getDetailBoard = async (id) => {
 
 const BoardService = {
   createBoard,
+  getBoards,
   getDetailBoard
 }
 

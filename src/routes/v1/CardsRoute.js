@@ -5,7 +5,11 @@ import { CardController } from '~/controllers/CardController'
 const Router = express.Router()
 
 Router.route('/')
+  .get(CardController.getCards)
   .post(CardValidation.createCard, CardController.createCard)
+
+Router.route('/:id')
+  .get(CardController.getDetailCard)
 
 const CardRoutes = Router
 

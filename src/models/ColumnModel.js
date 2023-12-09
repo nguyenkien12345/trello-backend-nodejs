@@ -2,6 +2,8 @@ import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
+import { BoardModel } from './BoardModel'
+import { CardModel } from './CardModel'
 
 const COLUMN_COLLECTION_NAME = 'columns'
 const COLUMN_COLLECTION_SCHEMA = Joi.object({
@@ -14,18 +16,25 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
 })
 
 const validateBeforeCreate = async (data) => {
-  const result = await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
-  return result
+  return await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
 
 const createColumn = async (data) => {
   try {
     const validData = await validateBeforeCreate(data)
-    const newColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne({
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne({
       ...validData,
       boardId: new ObjectId(validData.boardId)
     })
-    return newColumn
+  }
+  catch (error) {
+    throw new Error(error)
+  }
+}
+
+const getColumns = async () => {
+  try {
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).find()
   }
   catch (error) {
     throw new Error(error)
@@ -34,8 +43,34 @@ const createColumn = async (data) => {
 
 const getColumn = async (id) => {
   try {
-    const column = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
-    return column
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+  }
+  catch (error) {
+    throw new Error(error)
+  }
+}
+
+const getDetailColumn = async (id) => {
+  try {
+    const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).aggregate([
+      { $match: {
+        _id: new ObjectId(id),
+        _destroy: false
+      } },
+      { $lookup: {
+        from: BoardModel.BOARD_COLLECTION_NAME,
+        localField: 'boardId',
+        foreignField: '_id',
+        as: 'board'
+      } },
+      { $lookup: {
+        from: CardModel.CARD_COLLECTION_NAME,
+        localField: '_id',
+        foreignField: 'columnId',
+        as: 'cards'
+      } }
+    ]).toArray()
+    return result[0]
   }
   catch (error) {
     throw new Error(error)
@@ -59,12 +94,24 @@ const pushCardIdToCardOrderIds = async (card) => {
   }
 }
 
+const deleteColumn = async (id) => {
+  try {
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).deleteOne({ _id: new ObjectId(id) })
+  }
+  catch (error) {
+    throw new Error(error)
+  }
+}
+
 const ColumnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createColumn,
+  getColumns,
   getColumn,
-  pushCardIdToCardOrderIds
+  getDetailColumn,
+  pushCardIdToCardOrderIds,
+  deleteColumn
 }
 
 export { ColumnModel }

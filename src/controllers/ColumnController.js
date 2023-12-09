@@ -11,8 +11,41 @@ const createColumn = async (req, res, next) => {
   }
 }
 
+const getColumns = async (req, res, next) => {
+  try {
+    const result = await ColumnService.getColumns()
+    res.status(StatusCodes.OK).json(result)
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
+const getDetailColumn = async (req, res, next) => {
+  try {
+    const result = await ColumnService.getDetailColumn(req.params.id)
+    res.status(StatusCodes.OK).json(result)
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
+const deleteColumn = async (req, res, next) => {
+  try {
+    const result = await ColumnService.deleteColumn(req.params.id)
+    res.status(StatusCodes.OK).json(result)
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
 const ColumnController = {
-  createColumn
+  createColumn,
+  getColumns,
+  getDetailColumn,
+  deleteColumn
 }
 
 export { ColumnController }

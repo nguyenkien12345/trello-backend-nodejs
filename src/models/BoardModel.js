@@ -19,15 +19,22 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
 })
 
 const validateBeforeCreate = async (data) => {
-  const result = await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
-  return result
+  return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
 
 const createBoard = async (data) => {
   try {
     const validData = await validateBeforeCreate(data)
-    const newBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
-    return newBoard
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
+  }
+  catch (error) {
+    throw new Error(error)
+  }
+}
+
+const getBoards = async () => {
+  try {
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).find()
   }
   catch (error) {
     throw new Error(error)
@@ -36,8 +43,7 @@ const createBoard = async (data) => {
 
 const getBoard = async (id) => {
   try {
-    const board = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
-    return board
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
   }
   catch (error) {
     throw new Error(error)
@@ -52,21 +58,21 @@ const getDetailBoard = async (id) => {
         _destroy: false
       } },
       { $lookup: {
-        // Đi tìm những records trong models Column mà có khóa ngoại boardId bằng với khóa chính _id của models Board
+        // Đi tìm những records trong models Column mà có khóa ngoại boardId bằng với khóa chính _id của models Board. Dữ liệu sẽ được trả về trong field columns
         from: ColumnModel.COLUMN_COLLECTION_NAME,
         localField: '_id',
         foreignField: 'boardId',
-        as: 'columns' // 1 cái Board có nhiều cái columns. columns chính là tên key khi dữ liệu được trả về
+        as: 'columns'
       } },
       { $lookup: {
-        // Đi tìm những records trong models Card mà có khóa ngoại boardId bằng với khóa chính _id của models Board
+        // Đi tìm những records trong models Card mà có khóa ngoại boardId bằng với khóa chính _id của models Board. Dữ liệu sẽ được trả về trong field cards
         from: CardModel.CARD_COLLECTION_NAME,
         localField: '_id',
         foreignField: 'boardId',
-        as: 'cards' // 1 cái Board có nhiều cái cards. cards chính là tên key khi dữ liệu được trả về
+        as: 'cards'
       } }
     ]).toArray()
-    return result[0] || {}
+    return result[0]
   }
   catch (error) {
     throw new Error(error)
@@ -94,6 +100,7 @@ const BoardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createBoard,
+  getBoards,
   getBoard,
   getDetailBoard,
   pushColumnIdTocolumnOrderIds

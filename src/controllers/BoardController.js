@@ -12,10 +12,20 @@ const createBoard = async (req, res, next) => {
   }
 }
 
+const getBoards = async (req, res, next) => {
+  try {
+    const result = await BoardService.getBoards()
+    res.status(StatusCodes.OK).json(result)
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
 const getDetailBoard = async (req, res, next) => {
   try {
     const result = await BoardService.getDetailBoard(req.params.id)
-    res.status(StatusCodes.CREATED).json(result)
+    res.status(StatusCodes.OK).json(result)
   }
   catch (error) {
     next(error)
@@ -24,6 +34,7 @@ const getDetailBoard = async (req, res, next) => {
 
 const BoardController = {
   createBoard,
+  getBoards,
   getDetailBoard
 }
 

@@ -11,8 +11,30 @@ const createCard = async (req, res, next) => {
   }
 }
 
+const getCards = async (req, res, next) => {
+  try {
+    const result = await CardService.getCards()
+    res.status(StatusCodes.OK).json(result)
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
+const getDetailCard = async (req, res, next) => {
+  try {
+    const result = await CardService.getDetailCard(req.params.id)
+    res.status(StatusCodes.OK).json(result)
+  }
+  catch (error) {
+    next(error)
+  }
+}
+
 const CardController = {
-  createCard
+  createCard,
+  getCards,
+  getDetailCard
 }
 
 export { CardController }
