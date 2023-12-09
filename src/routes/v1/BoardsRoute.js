@@ -10,6 +10,7 @@ Router.route('/')
 
 Router.route('/:id')
   .get(BoardController.getDetailBoard)
+  .put(BoardValidation.updateBoard, BoardController.updateBoard)
 
 const BoardRoutes = Router
 
