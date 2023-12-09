@@ -79,7 +79,7 @@ const getDetailColumn = async (id) => {
 
 const pushCardIdToCardOrderIds = async (card) => {
   try {
-    const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(card.columnId) },
       // Thêm id của card đó vào mảng cardOrderIds của coulumn
       { $push: { cardOrderIds: new ObjectId(card._id) } },
@@ -87,7 +87,6 @@ const pushCardIdToCardOrderIds = async (card) => {
       // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
       { returnDocument: 'after' }
     )
-    return result.value || {}
   }
   catch (error) {
     throw new Error(error)

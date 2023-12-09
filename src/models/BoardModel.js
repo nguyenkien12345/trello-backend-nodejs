@@ -81,15 +81,14 @@ const getDetailBoard = async (id) => {
 
 const pushColumnIdTocolumnOrderIds = async (column) => {
   try {
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(column.boardId) },
       // Thêm id của column đó vào mảng columnOrderIds của board
       { $push: { columnOrderIds: new ObjectId(column._id) } },
       // returnDocument: 'after' => Nếu không truyền vào flag này thì nó sẽ trả về record trước khi update,
       // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
       { returnDocument: 'after' }
-    )
-    return result.value || {}
+    ) 
   }
   catch (error) {
     throw new Error(error)
@@ -98,7 +97,7 @@ const pushColumnIdTocolumnOrderIds = async (column) => {
 
 const pullColumnIdTocolumnOrderIds = async (column) => {
   try {
-    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(column.boardId) },
       // Lấy id của column đó ra khỏi mảng columnOrderIds của board
       { $pull: { columnOrderIds: new ObjectId(column._id) } },
@@ -106,7 +105,6 @@ const pullColumnIdTocolumnOrderIds = async (column) => {
       // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
       { returnDocument: 'after' }
     )
-    return result.value || {}
   }
   catch (error) {
     throw new Error(error)
