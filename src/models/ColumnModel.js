@@ -34,7 +34,7 @@ const createColumn = async (data) => {
 
 const getColumns = async () => {
   try {
-    return await GET_DB().collection(COLUMN_COLLECTION_NAME).find()
+    return await GET_DB().collection(COLUMN_COLLECTION_NAME).find({}).toArray()
   }
   catch (error) {
     throw new Error(error)
@@ -87,7 +87,7 @@ const pushCardIdToCardOrderIds = async (card) => {
       // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
       { returnDocument: 'after' }
     )
-    return result.value
+    return result.value || {}
   }
   catch (error) {
     throw new Error(error)

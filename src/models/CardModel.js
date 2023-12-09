@@ -36,7 +36,7 @@ const createCard = async (data) => {
 
 const getCards = async () => {
   try {
-    return await GET_DB().collection(CARD_COLLECTION_NAME).find()
+    return await GET_DB().collection(CARD_COLLECTION_NAME).find({}).toArray()
   }
   catch (error) {
     throw new Error(error)
@@ -81,7 +81,7 @@ const getDetailCard = async (id) => {
 
 const deleteManyCardByColumnId = async (columnId) => {
   try {
-    return await GET_DB().collection(CARD_COLLECTION_SCHEMA).deleteMany({ columnId: new ObjectId(columnId) })
+    return await GET_DB().collection(CARD_COLLECTION_NAME).deleteMany({ columnId: new ObjectId(columnId) })
   }
   catch (error) {
     throw new Error(error)

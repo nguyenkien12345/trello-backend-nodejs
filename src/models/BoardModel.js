@@ -34,7 +34,7 @@ const createBoard = async (data) => {
 
 const getBoards = async () => {
   try {
-    return await GET_DB().collection(BOARD_COLLECTION_NAME).find()
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).find({}).toArray()
   }
   catch (error) {
     throw new Error(error)
@@ -89,7 +89,24 @@ const pushColumnIdTocolumnOrderIds = async (column) => {
       // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
       { returnDocument: 'after' }
     )
-    return result.value
+    return result.value || {}
+  }
+  catch (error) {
+    throw new Error(error)
+  }
+}
+
+const pullColumnIdTocolumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(column.boardId) },
+      // Lấy id của column đó ra khỏi mảng columnOrderIds của board
+      { $pull: { columnOrderIds: new ObjectId(column._id) } },
+      // returnDocument: 'after' => Nếu không truyền vào flag này thì nó sẽ trả về record trước khi update,
+      // còn khi ta gọi returnDocument: 'after' thì nó sẽ trả về record sau khi update
+      { returnDocument: 'after' }
+    )
+    return result.value || {}
   }
   catch (error) {
     throw new Error(error)
@@ -103,7 +120,8 @@ const BoardModel = {
   getBoards,
   getBoard,
   getDetailBoard,
-  pushColumnIdTocolumnOrderIds
+  pushColumnIdTocolumnOrderIds,
+  pullColumnIdTocolumnOrderIds
 }
 
 export { BoardModel }

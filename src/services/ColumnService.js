@@ -45,6 +45,10 @@ const getDetailColumn = async (id) => {
 
 const deleteColumn = async (columnId) => {
   try {
+    // Cập nhật lại mảng columnOrderIds của Board
+    const targetColumn = await ColumnModel.getColumn(columnId)
+    if (!targetColumn) throw new ApiError(StatusCodes.NOT_FOUND, 'column not found')
+    await BoardModel.pullColumnIdTocolumnOrderIds(targetColumn)
     // Xóa column
     await ColumnModel.deleteColumn(columnId)
     // Xóa các card của column đó đi
